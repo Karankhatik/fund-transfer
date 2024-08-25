@@ -7,18 +7,44 @@ const connectDB = require('./config/database');
 // Connect to the database
 connectDB();
 
+
+app.use((req, res, next) => {
+    res.header("Content-Type", "application/json");
+    next();
+});
+
+app.use(express.urlencoded({ extended: true }));
 // Use JSON middleware
 app.use(express.json());
 
-// Set up CORS for all routes
-app.use(cors({
-    origin: ['https://fund-transfer-nine.vercel.app'], // Allow this frontend domain
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
-    credentials: true
-}));
-
-// Enable preflight requests for all routes
-app.options('*', cors()); // This line
+app.use((req,res, next) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader(`Permissions-Policy`, `accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),display-capture=(),document-domain=(),encrypted-media=(),fullscreen=(),gamepad=(),geolocation=(),gyroscope=(),layout-animations=(self),legacy-image-formats=(self),magnetometer=(),microphone=(),midi=(),oversized-images=(self),payment=(),picture-in-picture=(),publickey-credentials-get=(),speaker-selection=(),sync-xhr=(self),unoptimized-images=(self),unsized-media=(self),usb=(),screen-wake-lock=(),web-share=(),xr-spatial-tracking=()`);
+    next();
+});
+  
+  // Define allowed origins
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'https://fund-transfer-nine.vercel.app/'
+  ];
+  
+  // Define CORS options with TypeScript typing
+  const corsOptions = {
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true); 
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+    optionsSuccessStatus: 200 
+  };
+  
+  app.use(cors(corsOptions));
 
 // Define your routes
 app.use('/api/v1', require('./routes'));
