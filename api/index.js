@@ -8,11 +8,8 @@ const connectDB = require('./config/database');
 connectDB();
 
 app.use(express.json())
-app.use(cors({
-    origin: 'https://fund-transfer-nine.vercel.app', // Replace with your frontend domain
-    methods: 'GET,POST,PUT,DELETE', // Specify allowed HTTP methods
-    credentials: true // Allow cookies to be sent with requests
-}));
+app.options('*', cors()); // Enable preflight requests for all routes
+
 
 
 
