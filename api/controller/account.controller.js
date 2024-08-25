@@ -4,15 +4,15 @@ const mongoose = require('mongoose');
 const checkBalance = async (req, res) => {
     try {
         const user_id = req.userId;
-        if(!user_id) return res.status(400).json({message: "not authorized"});
+        if(!user_id) return res.status(400).json({message: "not authorized", success: false});
 
         const account = await Account.findOne({user_id: user_id});
 
         const balance = account.balance;
-        res.status(200).json({balance: balance});
+        res.status(200).json({balance: balance, success: true});                                    
     } catch (error) {
         console.log("error",error);
-        res.status(400).json({message: "something went wrong"});                                                         
+        res.status(400).json({message: "something went wrong", success: false});                                                         
     }
 }
 
@@ -30,7 +30,8 @@ const transferBalance = async (req, res) => {
         if (!account || account.balance < amount) {
             await session.abortTransaction();
             return res.status(400).json({
-                message: "Insufficient balance"
+                message: "Insufficient balance",
+                success: false
             });
         }
     
@@ -39,7 +40,8 @@ const transferBalance = async (req, res) => {
         if (!toAccount) {
             await session.abortTransaction();
             return res.status(400).json({
-                message: "Invalid account"
+                message: "Invalid account",
+                success: false
             });
         }
     
@@ -51,12 +53,13 @@ const transferBalance = async (req, res) => {
         await session.commitTransaction();
     
         res.json({
-            message: "Transfer successful"
+            message: "Transfer successful",
+            success: true
         });
 
     } catch (error) {
         console.log(error);
-        res.status(400).json({message: "something went wrong"});                                                         
+        res.status(400).json({message: "something went wrong", success: false});                                                         
     }
    
 }

@@ -6,4 +6,4 @@ router.get("/chekBalance", authUser, accountCtrl.checkBalance);
 router.post("/transferBalance", authUser, accountCtrl.transferBalance);
 
 
-module.exports = router
+module.exports = router;

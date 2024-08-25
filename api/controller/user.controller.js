@@ -12,14 +12,15 @@ const schema = zod.object({
 
 createUser = async (req, res) => {
     try {
-        const {first_name, last_name, username, password} = req.body;        
+        const {first_name, last_name, username, password} = req.body; 
 
         const result = schema.safeParse(req.body);
+        console.log(result.error)
         if (!result.success) {
-            return res.status(400).json({message: "Email already taken / Incorrect inputs"});
+            return res.status(400).json({message: "Email already taken / Incorrect inputs", success: false});
         }
         const user = await User.findOne({username: username});
-        if(user) return res.status(400).json({message: "Email already taken / Incorrect inputs"});
+        if(user) return res.status(400).json({message: "Email already taken / Incorrect inputs", success: false});
         
         const newUser = await User.create({
             first_name: first_name,
@@ -36,11 +37,11 @@ createUser = async (req, res) => {
 
         const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET, {expiresIn: '24h'});
 
-        res.status(200).json({message: "User Created", token: token});
+        res.status(200).json({message: "User Created", token: token, success: true});
         
     } catch (error) {
         console.log("error",error);
-        res.status(500).json({message: error.message});
+        res.status(500).json({message: error.message, success: false});
     } 
 }
 
@@ -55,18 +56,18 @@ const login = async (req, res) => {
         const result = loginSchema.safeParse(req.body);
 
         if(!result.success) {
-            return res.status(400).json({message: "Incorrect inputs"});
+            return res.status(400).json({message: "Incorrect inputs", success: false});
         }
 
         const user = await User.findOne({username: username});
-        if(!user) return res.status(400).json({message: "Incorrect inputs"});
+        if(!user) return res.status(400).json({message: "Incorrect inputs", success: false});
 
-        if(user.password !== password) return res.status(400).json({message: "Incorrect inputs"});
+        if(user.password !== password) return res.status(400).json({message: "Incorrect inputs", success: false});
         const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: '24h'});
-        res.status(200).json({message: "Login Successful", token: token});
+        res.status(200).json({message: "Login Successful", token: token, success: true});
     } catch (error) {
         console.log("error",error);
-        res.status(500).json({message: "soemething went wrong"});
+        res.status(500).json({message: "soemething went wrong", success: false});
     } 
 }
 
@@ -78,11 +79,34 @@ const logout = async (req, res) => {
         console.log("error",error);
         res.status(500).json({message: "soemething went wrong"});
     } 
-}   
+}  
+
+const getUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if(!user) return res.status(404).json({message: "User not found", success: false});
+        res.status(200).json({user: user, success: true});
+    } catch (error) {
+        console.log("error",error);
+        res.status(500).json({message: "soemething went wrong", success: false});
+    } 
+}
+
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json({users: users, success: true});
+    } catch (error) {
+        console.log("error",error);
+        res.status(500).json({message: "soemething went wrong", success: false});
+    }
+}
 
 
 module.exports = {
     createUser,
     login,
-    logout
+    logout,
+    getUser,
+    getAllUsers
 }
