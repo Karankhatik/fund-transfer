@@ -12,7 +12,7 @@ const Navbar = ({user}) => {
   return (
     <div className='bg-slate-200 px-8 p-5 flex justify-between items-center'>
         <div>
-            <h1 className='text-2xl font-bold'>Paytm</h1>
+            <h1 className='text-2xl font-bold'>Fund transfer</h1>
         </div>
 
         <div className="flex items-center gap-5">
