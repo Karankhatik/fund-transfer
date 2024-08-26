@@ -84,6 +84,12 @@ const Signin = () => {
     }
   };
 
+  useEffect(() => {
+    if(localStorage.getItem("token")) { 
+      setAuth(true);   
+      navigate("/dashboard");     
+    }
+  }, [])
   
   
 
