@@ -1,5 +1,5 @@
 
-const baseURL = "https://fund-transfer-backend.vercel.app//api/v1";
+const baseURL = "https://fund-transfer-backend.vercel.app/api/v1";
 export const signupAPI = {
     url: `${baseURL}/user/signup`,
     method: "POST",
